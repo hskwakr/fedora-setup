@@ -24,12 +24,27 @@ FONT_INSTALL_DIR="/usr/share/fonts/nerd-fonts"
 TEMP_DIR="/tmp/nerdfonts"
 
 # ------------------------------------------------------------------------------
+# Check required commands
+# ------------------------------------------------------------------------------
+check_requirements() {
+  if ! command -v "$1" &> /dev/null; then
+    echo "Error: Required command $1 is not installed." >&2
+    exit 1
+  fi
+}
+
+# ------------------------------------------------------------------------------
 # Require running as root (or via sudo)
 # ------------------------------------------------------------------------------
 if [ "$EUID" -ne 0 ]; then
   echo "Please run this script as root (e.g., 'sudo ./install.sh')."
   exit 1
 fi
+
+# Check for required commands
+check_requirements curl
+check_requirements unzip
+check_requirements fc-cache
 
 # ------------------------------------------------------------------------------
 # Update system packages
