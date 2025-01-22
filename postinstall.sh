@@ -67,6 +67,7 @@ dnf -y install \
   gnome-tweaks \
   util-linux-user \
   pass \
+  unzip \
 
 # ------------------------------------------------------------------------------
 # Multimedia Support
