@@ -9,6 +9,15 @@ PACKAGES=(
   ipa-gothic-fonts
   google-noto-sans-mono-fonts
 )
+
+# Nerd Fonts関連の変数を追加
+NERD_FONTS_DIR="/usr/share/fonts/nerd-fonts"
+NERD_FONTS=(
+  "FiraMono"
+  "CascadiaMono"
+  "GeistMono"
+)
+
 FONT_PATTERNS=(
   "*fira*"
   "*ipa*"
@@ -99,6 +108,31 @@ for dir in "${FONT_DIRECTORIES[@]}"; do
     fi
   fi
 done
+
+# ------------------------------------------------------------------------------
+# Remove Nerd Fonts
+# ------------------------------------------------------------------------------
+print_section "Removing Nerd Fonts"
+if [ -d "$NERD_FONTS_DIR" ]; then
+  echo "Removing Nerd Fonts from $NERD_FONTS_DIR"
+  for font in "${NERD_FONTS[@]}"; do
+    if [ -d "$NERD_FONTS_DIR/$font" ]; then
+      echo "Removing $font..."
+      rm -rf "$NERD_FONTS_DIR/$font"
+    fi
+  done
+  
+  # ディレクトリが空の場合は削除
+  if [ -z "$(ls -A $NERD_FONTS_DIR)" ]; then
+    rm -rf "$NERD_FONTS_DIR"
+  fi
+else
+  echo "Nerd Fonts directory not found. Skipping."
+fi
+
+# フォントキャッシュを更新
+echo "Updating font cache..."
+fc-cache -fv
 
 # ------------------------------------------------------------------------------
 # Cleanup & Finish

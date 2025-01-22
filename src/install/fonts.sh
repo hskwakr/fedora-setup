@@ -2,13 +2,26 @@
 set -euo pipefail
 
 # ------------------------------------------------------------------------------
-# Variables
+# Variables (System Fonts)
 # ------------------------------------------------------------------------------
 PACKAGES=(
   fira-code-fonts
   ipa-gothic-fonts
   google-noto-sans-mono-fonts
 )
+
+# ------------------------------------------------------------------------------
+# Variables (Nerd Fonts)
+# ------------------------------------------------------------------------------
+NERD_FONTS=(
+  "FiraMono"
+  "CascadiaMono"
+  "GeistMono"
+)
+
+NERD_FONTS_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
+FONT_INSTALL_DIR="/usr/share/fonts/nerd-fonts"
+TEMP_DIR="/tmp/nerdfonts"
 
 # ------------------------------------------------------------------------------
 # Require running as root (or via sudo)
@@ -25,9 +38,9 @@ echo "Updating system packages..."
 dnf -y update
 
 # ------------------------------------------------------------------------------
-# Install Fonts
+# Install system fonts
 # ------------------------------------------------------------------------------
-echo "Installing fonts..."
+echo "Installing system fonts..."
 for pkg in "${PACKAGES[@]}"; do
   if dnf -y install "$pkg"; then
     echo "Successfully installed $pkg."
@@ -35,6 +48,32 @@ for pkg in "${PACKAGES[@]}"; do
     echo "Failed to install $pkg. Skipping..." >&2
   fi
 done
+
+# ------------------------------------------------------------------------------
+# Install Nerd Fonts
+# ------------------------------------------------------------------------------
+echo "Installing Nerd Fonts..."
+mkdir -p "$FONT_INSTALL_DIR"
+mkdir -p "$TEMP_DIR"
+
+for font in "${NERD_FONTS[@]}"; do
+  echo "Downloading $font Nerd Font..."
+  FONT_ZIP="${font}.zip"
+  if curl -L -o "$TEMP_DIR/$FONT_ZIP" "$NERD_FONTS_URL/$FONT_ZIP"; then
+    echo "Extracting $font..."
+    unzip -o "$TEMP_DIR/$FONT_ZIP" -d "$FONT_INSTALL_DIR/$font"
+    echo "$font installed successfully."
+  else
+    echo "Failed to download $font. Skipping..." >&2
+  fi
+done
+
+# Update font cache
+echo "Updating font cache..."
+fc-cache -fv
+
+# Clean up temporary files
+rm -rf "$TEMP_DIR"
 
 # ------------------------------------------------------------------------------
 # Cleanup & Finish

@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
+# Check if running as root
+if [ "$(id -u)" -eq 0 ]; then
+    echo "Error: This script should not be run as root or with sudo"
+    echo "Please run as normal user"
+    exit 1
+fi
+
 if ! command -v curl &>/dev/null; then
   echo "[ERROR] curl is not installed. Please install curl first."
   exit 1
