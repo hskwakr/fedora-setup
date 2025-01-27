@@ -21,6 +21,15 @@ else
     echo "Flathub repository is already added."
 fi
 
+# Install or update Freedesktop Platform
+if flatpak list --runtime | grep -q "org.freedesktop.Platform"; then
+    echo "Freedesktop Platform is already installed. Checking for updates..."
+    flatpak update -y org.freedesktop.Platform
+else
+    echo "Installing Freedesktop Platform..."
+    flatpak install -y flathub org.freedesktop.Platform
+fi
+
 # Install or update Slack
 if flatpak list --app | grep -q "com.slack.Slack"; then
     echo "Slack is already installed. Checking for updates..."
