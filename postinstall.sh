@@ -68,6 +68,8 @@ dnf -y install \
   util-linux-user \
   pass \
   unzip \
+  procps-ng \
+  file \
 
 # ------------------------------------------------------------------------------
 # Multimedia Support
