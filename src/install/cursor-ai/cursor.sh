@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# https://github.com/watzon/cursor-linux-installer
 
 set -e
 
@@ -47,7 +48,27 @@ function install_cursor() {
     local current_dir=$(pwd)
 
     echo "Downloading latest Cursor AppImage..."
-    if ! curl -L "$download_url" -o "$temp_file"; then
+    
+        # If the download URL is https://downloader.cursor.sh, then we need to skip the extraction of the download URL
+    if [[ "$download_url" == *"downloader.cursor.sh"* ]]; then
+        # Direct download URL
+        local actual_download_url="$download_url"
+    else
+        # Need to extract download URL from API response
+        local json_response=$(curl -s -L "$download_url")
+        local actual_download_url=$(echo "$json_response" | grep -o '"downloadUrl":"[^"]*"' | cut -d'"' -f4)
+        
+        if [ -z "$actual_download_url" ]; then
+            echo "Failed to extract download URL from response" >&2
+            echo "Response: $json_response" >&2
+            rm -f "$temp_file"
+            return 1
+        fi
+        
+        echo "Extracted download URL: $actual_download_url"
+    fi
+    
+    if ! curl -L "$actual_download_url" -o "$temp_file"; then
         echo "Failed to download Cursor AppImage" >&2
         rm -f "$temp_file"
         return 1
@@ -89,7 +110,8 @@ function install_cursor() {
 function update_cursor() {
     echo "Updating Cursor..."
     local arch=$(get_arch)
-    local download_url="https://downloader.cursor.sh/linux/appImage/$arch"
+    # local download_url="https://downloader.cursor.sh/linux/appImage/$arch"
+    local download_url="https://www.cursor.com/api/download?platform=linux-x64&releaseTrack=latest"
     local current_appimage=$(find_cursor_appimage)
     local install_dir
 
